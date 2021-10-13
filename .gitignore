@@ -1,0 +1,4 @@
+data/*
+models/*
+fastapi/models/*
+.idea/*
