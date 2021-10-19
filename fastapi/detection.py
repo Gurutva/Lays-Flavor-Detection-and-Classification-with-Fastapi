@@ -61,10 +61,10 @@ class LaysDetector:
             #     draw.rectangle([(boxes[0], boxes[1]), (boxes[2], boxes[3])],outline="red", width=3)
             #     draw.text((boxes[0], boxes[1]), text=out_text, )
 
-        image = transform(image)
-        save_image(image, 'sample.png')
+        #image = transform(image)
+        #save_image(image, 'sample.png')
 
-        return 'sample.png',new_boxes
+        return image,new_boxes
 
 
     def get_boxes(self,img):

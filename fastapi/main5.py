@@ -8,10 +8,11 @@ import uvicorn
 from fastapi import FastAPI, File, UploadFile, Response
 import numpy as np
 from starlette.responses import StreamingResponse
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse,HTMLResponse
 from PIL import Image, ImageDraw
 from torchvision.utils import save_image
 import cv2
+import base64
 
 app = FastAPI()
 
@@ -59,36 +60,32 @@ async def predict_api(file: UploadFile = File(...)):
 
     predict_image,new_boxes=detector.draw_detection(detected_images,img)
 
+    #predict_image=transform_toPil(predict_image)
+
     new_boxes_dict = dict()
     for key in range(len(new_boxes)):
         new_boxes_dict['box '+str(new_boxes[key][0])+':'+str(detected_images[key][0])] = np.array(new_boxes[key][1]).tolist()
     #return new_boxes_dict
-    return FileResponse(predict_image)
+    #return FileResponse(predict_image)
     #return FileResponse(predict_image),new_boxes_dict
-    #return  {'success'}
 
-    # image=transform(image)
-    # save_image(image, 'sample.png')
-    # return new_boxes
-    #return FileResponse('sample.png')
-    #return {FileResponse('sample.png') , new_boxes}
+    # with open("sample.png", "rb") as imageFile:
+    #     p = base64.b64encode(imageFile.read())
+    #encoded_img = base64.b64encode(p)
 
-    #return Response(io.BytesIO(image.tobytes()), media_type="image/png")
-    # byte_io=io.BytesIO()
-    # return image.save(byte_io, 'PNG')
+    predict_image = np.asarray(predict_image)
+    _,encoded_image = cv2.imencode('.PNG',predict_image)
 
-    #return FileResponse(image)
+    encoded_image  = base64.b64encode(encoded_image)
 
-    #return plt.imshow(image)
+    with open('new_image3.png','wb') as new_file:
+        new_file.write(base64.decodebytes(encoded_image ))
 
-    #return FileResponse(file.filename)
+    return {
+        'dimensions': new_boxes_dict,
+        'encoded_img': encoded_image ,
+    }
 
-# @app.post("/vector_image")
-# def image_endpoint(*, vector):
-#     # Returns a cv2 image array from the document vector
-#     cv2img = my_function(vector)
-#     res, im_png = cv2.imencode(".png", cv2img)
-#     return StreamingResponse(io.BytesIO(im_png.tobytes()), media_type="image/png")
 
 if __name__ == "__main__":
     uvicorn.run(app, debug=True)
