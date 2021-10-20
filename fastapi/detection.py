@@ -41,6 +41,7 @@ class LaysDetector:
         image = Image.fromarray(img.mul(255).permute(1, 2, 0).byte().numpy())
         draw = ImageDraw.Draw(image)
         new_boxes = []
+        count = 0
         for element in range(len(prediction[0]["boxes"])):
             boxes = prediction[0]["boxes"][element].cpu().numpy()
             #           print(boxes)
@@ -51,9 +52,11 @@ class LaysDetector:
 
             #out_text = flv_name + '=box {0}'.format(element) + '|p=' + str(detection_score) + '|c=' + str(flv_score)
             # out_text='box{0}'.format(element)
-            out_text = flv_name
+            #out_text = flv_name
 
             if detection_score > 0.1 and detected_images[element][1] > 0.5:
+                out_text = flv_name + ':box {0}'.format(count)
+                count+=1
                 draw.rectangle([(boxes[0], boxes[1]), (boxes[2], boxes[3])], outline="green", width=5)
                 draw.text((boxes[0], boxes[1]), text=out_text, )
                 new_boxes.append((element, boxes))
@@ -63,6 +66,9 @@ class LaysDetector:
 
         #image = transform(image)
         #save_image(image, 'sample.png')
+        #print('1',type(image))
+        #print(image.size)
+        #image.show()
 
         return image,new_boxes
 
