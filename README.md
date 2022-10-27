@@ -9,4 +9,4 @@ run => fastapi/main6.py
 
 .
 
-![alt text image](fastapi/test.jpeg?raw=true)
+![alt text image](fastapi/new_image.png?raw=true)
